@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title></title>
+</head>
+
+<style type='text/css'>
+ body {
+  font-family: Monospace;
+  font-size: 1.1em;
+  text-align: right; 
+ }
+ h1 {
+  text-align: left;
+  border-bottom: solid 1px; 
+ }
+</style>
+
+<body>
+
+<script type="text/javascript" src="consts2048_256bit.js"></script>
+<script type="text/javascript" src="DH.js"></script>
+
+<script type="text/javascript">
+
+Number.prototype.toStringAdvanced= function(radix, capacity, group_length, group_separator, groups_in_supergroup, supergroup_separator) {
+ var str=this.toString(radix), i;
+ if (capacity!==undefined && capacity>0) { 
+  for (i=str.length; i<capacity; i++) str='0'+str;
+  str=str.substr(0, capacity);
+ }
+
+ if (group_length!== undefined && group_length<str.length) {
+  var str2='', gn=1;
+  for (i=str.length-1; i>=0; i-=group_length, gn++)
+   if (groups_in_supergroup!==undefined && groups_in_supergroup>0 && gn%groups_in_supergroup==0)
+    str2=(i>group_length?supergroup_separator:'')+str.substring(i-group_length+1, i+1)+str2;
+   else {
+    str2=(i>group_length?group_separator:'')+str.substring(i-group_length+1, i+1)+str2;
+   }
+  return(str2);
+ } else return(str);
+}
+
+Array.prototype.toStringAdvanced=function(radix, capacity, group_length, group_separator) {
+ var s='';
+ for (var i=0; i<this.length; i++)
+  s=group_separator+this[i].toStringAdvanced(radix, capacity, group_length, group_separator)+s;
+ return(s);
+}
+
+
+function Print2DArrayAssigmentJS(a, aname) {
+ var i, j;
+ var im=a.length-1, jm=a[0].length-1;
+ document.write('<br />const '+aname+'=[');
+ for (i=0; i<=im-1; i++) {
+  document.write('[');
+  for (j=0; j<=jm-1; j++) document.write(a[i][j]+', ');
+  document.writeln(a[i][jm]+'],<br />');
+ }
+ document.write('[');
+ for (j=0; j<=jm-1; j++) document.write(a[im][j]+', ');
+ document.write(a[im][jm]+']];<br />');
+}
+
+var A=[], a=[], B=[], b=[], eb=(LDE+1)*32;
+
+ for (i=0; i<=LDE; i++) a[i]=Math.floor(Math.random()*D32), b[i]=Math.floor(Math.random()*D32); 
+
+ // for (i=A.length; i<=LD; i++) A[i]=AA[i]=0;
+ 
+ 
+ document.write('<h1>Alice:</h1>');
+ document.write (eb+'-bit private <b>a</b> = '+a.toStringAdvanced(16,8, 4, ' ')+'<br /><br />'); 
+ var dstart=new Date();    GPowMod(A, a);     var dend=new Date(); 
+ document.write(BSP+'-bit public <b>A</b> = 2^a%P =<br />'+A.toStringAdvanced(16,8, 4, ' ')+'<br /><br />');
+ document.write('Calculation time: '+(dend.getTime()-dstart.getTime())+' milliseconds<br />');
+
+
+ document.write('<h1>Bob:</h1>');
+ document.write (eb+'-bit private <b>b</b> = '+b.toStringAdvanced(16,8, 4, ' ')+'<br /><br />');
+ var dstart=new Date();   GPowMod(B, b);   var dend=new Date(); 
+ document.write(BSP+'-bit public <b>B</b> = 2^b%P =<br />'+B.toStringAdvanced(16,8, 4, ' ')+'<br /><br />');
+ document.write('Calculation time: '+(dend.getTime()-dstart.getTime())+' ms<br />');
+ 
+ document.write('<h1>Alice:</h1>');
+ var dstart=new Date();   PowMod(B, a);   var dend=new Date();
+ document.write(BSP+'-bit pivate session key <b>s</b> = B^a%P = 2^(b*a)%P =<br />'+B.toStringAdvanced(16,8, 4, ' ')+'<br /><br />');
+ document.write('Calculation time: '+(dend.getTime()-dstart.getTime())+' ms<br />');
+
+ 
+ document.write('<h1>Bob:</h1>');
+ var dstart=new Date();   PowMod(A, b);   var dend=new Date();
+ document.write(BSP+'-bit pivate session key <b>s</b> = A^b%P = 2^(a*b)%P =<br />'+A.toStringAdvanced(16,8, 4, ' ')+'<br /><br />');
+ document.write('Calculation time: '+(dend.getTime()-dstart.getTime())+' ms<br />');
+ 
+
+
+
+
+</script>
+
+</body>
+</html>
